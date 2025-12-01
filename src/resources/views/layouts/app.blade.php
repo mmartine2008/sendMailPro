@@ -33,5 +33,17 @@
                 {{ $slot }}
             </main>
         </div>
+
+        <script src="https://cdn.ckeditor.com/ckeditor5/41.0.0/classic/ckeditor.js"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                document.querySelectorAll('.wysiwyg').forEach(el => {
+                    ClassicEditor
+                        .create(el)
+                        .catch(error => console.error(error));
+                });
+            });
+        </script>
+
     </body>
 </html>

@@ -26,9 +26,15 @@ class CuentaController extends Controller
             'nombre'   => 'required',
             'password' => 'required',
             'smtp_id'  => 'required|exists:smtp_table,id',
+            'activa' => 'nullable|boolean',
         ]);
 
-        Cuenta::create($request->all());
+        Cuenta::create([
+            'nombre' => $request->nombre,
+            'password' => $request->password,
+            'smtp_id' => $request->smtp_id,
+            'activa' => $request->has('activa'),
+        ]);
 
         return redirect()->route('cuentas.index');
     }
@@ -45,6 +51,7 @@ class CuentaController extends Controller
             'nombre'   => 'required',
             'password' => 'required',
             'smtp_id'  => 'required|exists:smtp_table,id',
+            'activa' => 'nullable|boolean',
         ]);
 
         $cuenta->update($request->all());

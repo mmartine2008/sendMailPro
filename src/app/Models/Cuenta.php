@@ -14,6 +14,7 @@ class Cuenta extends Model
         'nombre',
         'password',
         'smtp_id',
+        'activa'
     ];
 
     // Relationship: each account belongs to one smtp

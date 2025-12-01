@@ -16,6 +16,7 @@
                         <th class="text-left py-2 border-b">ID</th>
                         <th class="text-left py-2 border-b">Nombre</th>
                         <th class="text-left py-2 border-b">SMTP</th>
+                        <th class="text-left py-2 border-b">Activa</th>
                         <th class="text-left py-2 border-b">Acciones</th>
                     </tr>
                 </thead>
@@ -32,7 +33,13 @@
                                 <span class="text-gray-500">Sin asignar</span>
                             @endif
                             </td>
-
+                            <td class="py-2">
+                                @if ($cuenta->activa)
+                                    <span class="text-green-600 font-semibold">Sí</span>
+                                @else
+                                    <span class="text-red-600 font-semibold">No</span>
+                                @endif
+                            </td>
                             <td class="py-2 flex gap-2">
 
                                 {{-- Editar --}}

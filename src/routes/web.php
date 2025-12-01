@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\SmtpController;
 use App\Http\Controllers\CuentaController;
+use App\Http\Controllers\MensajeProgramadoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,6 +54,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/cuentas/{cuenta}/edit', [CuentaController::class, 'edit'])->name('cuentas.edit');
     Route::put('/cuentas/{cuenta}', [CuentaController::class, 'update'])->name('cuentas.update');
     Route::delete('/cuentas/{cuenta}', [CuentaController::class, 'destroy'])->name('cuentas.destroy');
+
+    Route::resource('mensajes', MensajeProgramadoController::class);
 
 });
 
