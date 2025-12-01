@@ -26,7 +26,11 @@
                             <td class="py-2">{{ $cuenta->id }}</td>
                             <td class="py-2">{{ $cuenta->nombre }}</td>
                             <td class="py-2">
-                                {{ $cuenta->smtp?->nombre ?? 'Sin asignar' }}
+                            @if ($cuenta->smtp->host)
+                                {{ $cuenta->smtp->host }}
+                            @else
+                                <span class="text-gray-500">Sin asignar</span>
+                            @endif
                             </td>
 
                             <td class="py-2 flex gap-2">
