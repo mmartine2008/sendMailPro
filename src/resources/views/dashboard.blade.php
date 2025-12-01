@@ -14,6 +14,7 @@
                         <x-dashboard.smtp-card />
                         <x-dashboard.cuentas-card />
                         <x-dashboard.envio-card />
+                        <x-dashboard.enviar-card />
                     </div>
                 </div>
             </div>

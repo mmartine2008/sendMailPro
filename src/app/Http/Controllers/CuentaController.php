@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cuenta;
 use App\Models\SmtpConfig;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CuentaController extends Controller
 {
@@ -22,12 +23,19 @@ class CuentaController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        print_r($request->all());
+
+        $validator = Validator::make($request->all(), [
             'nombre'   => 'required',
             'password' => 'required',
-            'smtp_id'  => 'required|exists:smtp_table,id',
-            'activa' => 'nullable|boolean',
+            'smtp_id'  => 'required|exists:smtp_table,id'
         ]);
+
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput();
+        }
 
         Cuenta::create([
             'nombre' => $request->nombre,

@@ -6,6 +6,9 @@ use App\Http\Controllers\EmailController;
 use App\Http\Controllers\SmtpController;
 use App\Http\Controllers\CuentaController;
 use App\Http\Controllers\MensajeProgramadoController;
+use App\Http\Controllers\EmailSendController;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -58,5 +61,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('mensajes', MensajeProgramadoController::class);
 
 });
+
+Route::get('/enviar-emails', [EmailSendController::class, 'enviar'])
+    ->name('emails.enviar');
 
 require __DIR__.'/auth.php';
