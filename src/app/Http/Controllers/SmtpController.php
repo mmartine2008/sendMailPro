@@ -20,13 +20,13 @@ class SmtpController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'host' => 'required',
-            'username' => 'required',
-            'password' => 'required',
-            'encryption' => 'required',
-            'port' => 'required|integer',
-        ]);
+        // $request->validate([
+        //     'host' => 'required',
+        //     'username' => 'required',
+        //     'password' => 'required',
+        //     'encryption' => 'required',
+        //     'port' => 'required|integer',
+        // ]);
 
         SmtpConfig::create($request->all());
 
@@ -42,13 +42,13 @@ class SmtpController extends Controller
 
     public function update(Request $request, SmtpConfig $smtp)
     {
-        $request->validate([
-            'host' => 'required',
-            'username' => 'required',
-            'password' => 'required',
-            'encryption' => 'required',
-            'port' => 'required|integer',
-        ]);
+        // $request->validate([
+        //     'host' => 'required',
+        //     'username' => 'required',
+        //     'password' => 'required',
+        //     'encryption' => 'required',
+        //     'port' => 'required|integer',
+        // ]);
 
         $smtp->update($request->all());
 

@@ -1,4 +1,10 @@
 services:
+  smtp4dev:
+    image: rnwood/smtp4dev
+    ports:
+      - "3000:80"     # UI
+      - "2525:25"     # SMTP
+
   web:
     container_name: sendMailPro
     image: mydocker/apache:1.0.0.petitions
