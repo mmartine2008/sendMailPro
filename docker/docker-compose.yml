@@ -1,0 +1,36 @@
+services:
+  web:
+    container_name: sendMailPro
+    image: mydocker/apache:1.0.0.petitions
+    ports:
+      - 80:80
+    volumes:
+      - ../src:/var/www/html
+      - ../tmp:/tmp
+      - ../src/petitions.conf:/etc/apache2/sites-available/000-default.conf
+      - ./custom.ini:/usr/local/etc/php/conf.d/custom.ini
+    depends_on:
+      - mysqldb
+    environment:
+      - TZ=America/Argentina/Buenos_Aires
+      - SERVICE_PORTS=80
+      - LANG=es_AR.utf8
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+  mysqldb:
+    image: mysql:8.0
+    container_name: sendMail_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mails
+#      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+    volumes:
+      - ../mysqldata:/var/lib/mysql
+    ports:
+      - 3306:3306
+volumes:
+  db_data:
