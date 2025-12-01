@@ -12,6 +12,7 @@
                     <div class="flex">
                         <x-dashboard.emails-card />
                         <x-dashboard.smtp-card />
+                        <x-dashboard.cuentas-card />
                     </div>
                 </div>
             </div>

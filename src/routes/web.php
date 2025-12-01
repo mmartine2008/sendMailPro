@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\SmtpController;
+use App\Http\Controllers\CuentaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,6 +42,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/smtp/{smtp}/edit', [SmtpController::class, 'edit'])->name('smtp.edit');
     Route::put('/smtp/{smtp}', [SmtpController::class, 'update'])->name('smtp.update');
     Route::delete('/smtp/{smtp}', [SmtpController::class, 'destroy'])->name('smtp.destroy');
+
+});
+
+Route::middleware(['auth'])->group(function () {
+
+    Route::get('/cuentas', [CuentaController::class, 'index'])->name('cuentas.index');
+    Route::get('/cuentas/create', [CuentaController::class, 'create'])->name('cuentas.create');
+    Route::post('/cuentas', [CuentaController::class, 'store'])->name('cuentas.store');
+    Route::get('/cuentas/{cuenta}/edit', [CuentaController::class, 'edit'])->name('cuentas.edit');
+    Route::put('/cuentas/{cuenta}', [CuentaController::class, 'update'])->name('cuentas.update');
+    Route::delete('/cuentas/{cuenta}', [CuentaController::class, 'destroy'])->name('cuentas.destroy');
 
 });
 
