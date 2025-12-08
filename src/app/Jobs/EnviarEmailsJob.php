@@ -107,6 +107,20 @@ class EnviarEmailsJob implements ShouldQueue
         $cuenta->save();
     }
 
+    private function configurarSMTP($cuenta) {
+        config([
+            'mail.mailers.smtp.host' => $cuenta->SmtpConfig->host,
+            'mail.mailers.smtp.port' => $cuenta->SmtpConfig->port,
+            'mail.mailers.smtp.username' => $cuenta->nombre,
+            'mail.mailers.smtp.password' => $cuenta->password,
+            'mail.mailers.smtp.encryption' => $cuenta->SmtpConfig->encryption,
+            'mail.from.address' => $cuenta->nombre,
+            'mail.from.name' => $cuenta->nombre,
+        ]);
+        app()->forgetInstance('mailer');
+        app()->make('mailer');
+    }
+
     private function enviarMensajeProgramado($mensaje) {
         $info = [
             'id' => $mensaje->id,
@@ -130,30 +144,11 @@ class EnviarEmailsJob implements ShouldQueue
             $this->actualizaCuentaEnvios($cuenta);
             Log::info('Cuenta de envio', $cuenta->toArray());
 
+            $this->configurarSMTP($cuenta);
+
             try {
                 // Sleep random time (1 to 6 seconds)
                 sleep(rand(1, 6));
-
-                /*
-                config([
-                    'mail.mailers.smtp.host' => $cuenta->SmtpConfig->host,
-                    'mail.mailers.smtp.port' => $cuenta->SmtpConfig->port,
-                    'mail.mailers.smtp.username' => $cuenta->nombre,
-                    'mail.mailers.smtp.password' => $cuenta->password,
-                    'mail.mailers.smtp.encryption' => $cuenta->SmtpConfig->encryption,
-                    'mail.from.address' => $cuenta->nombre,
-                    'mail.from.name' => $cuenta->nombre,
-                ]);
-
-                config([
-                    'mail.mailers.smtp.host'       => 'smtp4dev',   // English comment: smtp4dev host
-                    'mail.mailers.smtp.port'       => 25,            // Default smtp4dev port
-                    'mail.mailers.smtp.username'   => null,
-                    'mail.mailers.smtp.password'   => null,
-                    'mail.mailers.smtp.encryption' => null,
-                    'mail.from.address'            => 'test@example.com',
-                    'mail.from.name'               => 'Testing',
-                ]);*/
 
                 $info = [
                             'email' => $email->email,
