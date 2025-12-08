@@ -28,9 +28,8 @@ RUN apt update --fix-missing
 RUN apt install git -y
 
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs
+    && apt-get install -y nodejs cron
 
-RUN apt install cron -y
 RUN service cron start
 
 WORKDIR /var/www/html

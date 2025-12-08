@@ -13,11 +13,15 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Log;
+use App\Mail\Notificacion;
 
 /**
  * Tiene que haber un crontab programado, que dispare EnviarMailsJob cada minuto
  * Los Mensajes, tienen tres estados 0-Sin iniciar, 1-Iniciado, 2-Terminado
- *
+ * Las cuentas tienen un indicador de enviados, que no debe superar los 450.
+ * Cuando alcanzan los 450, pasa a desabilitado, y se registra la fecha.
+ * Con esa fecha, cada vez que se consulta, si han pasado 24, se vuelve a
+ * habilitar, se pone ne 0 y se anula fecha
  *
  */
 
@@ -41,18 +45,8 @@ class EnviarEmailsJob implements ShouldQueue
         return $mensajes;
     }
 
-
-    private function enviarMensajeProgramado($mensaje) {
-        $info = [
-            'id' => $mensaje->id,
-            'subject' => $mensaje->subject
-        ];
-        Log::info('Enviando Mensaje Programado:', $info);
-    }
-
     public function handle()
     {
-
         // Get scheduled messages valid for today
         $mensajes = $this->mensajesProgramadosHoy();
 
@@ -61,50 +55,123 @@ class EnviarEmailsJob implements ShouldQueue
                 $this->enviarMensajeProgramado($mensaje);
             }
         }
+    }
 
-        return;
 
+    private function getActiveCount() {
         // Get active SMTP accounts
         $cuentas = Cuenta::where('activa', true)
+                    ->where('envios', '<', 450)
                     ->with('SmtpConfig')
+                    ->orderBy('envios')
                     ->get();
 
-        if ($cuentas->isEmpty()) {
-            return;
+        // Encontre una cuenta en condiciones
+        if ($cuentas->count() > 0) {
+            $cuenta = $cuentas->first();
+            return $cuenta;
         }
+
+        $cuentas = Cuenta::where('activa', true)
+        ->where('fecha_bloqueo', '<', 450)
+        ->with('SmtpConfig')
+        ->orderBy('envios')
+        ->get();
+
+        // Recupero la cuenta con fecha de bloqueo mas vieja
+        $cuenta = Cuenta::where('estado', 'activo')
+                 ->whereNotNull('fecha_bloqueo')
+                 ->with('SmtpConfig')
+                 ->orderBy('fecha_bloqueo')
+                 ->first();
+
+
+        if ($cuenta->fecha_bloqueo && $cuenta->fecha_bloqueo->addHours(24)->lt(now())) {
+        // Ya pasaron las 24 horas desde el bloqueo
+            $cuenta->fecha_bloqueo = null;
+            $cuenta->envios = 0;
+            $cuenta->save();
+            return $cuenta;
+        }
+
+        Log::error('No hay cuentas disponibles', []);
+        return null;
+    }
+
+    private function actualizaCuentaEnvios($cuenta) {
+        $cuenta->envios++;
+        if ($cuenta->envios == 450) {
+            $cuenta->fecha_bloqueo = now();
+        }
+        $cuenta->save();
+    }
+
+    private function enviarMensajeProgramado($mensaje) {
+        $info = [
+            'id' => $mensaje->id,
+            'subject' => $mensaje->subject
+        ];
+        Log::info('Enviando Mensaje Programado:', $info);
+
+
 
         // Get pending emails
         $emails = Email::where('enviado', false)->get();
+        $info = ['cantidad.emails' => $emails->count()];
+        Log::info('Cantidad de emails', $info);
 
         foreach ($emails as $email) {
+            // Este ciclo puede repetirse por horas, hasta conseguir una cuenta
+            do {
+                $cuenta = $this->getActiveCount();
+            } while ($cuenta == null);
 
-            // Pick a random account
-            $cuenta = $cuentas->random();
+            $this->actualizaCuentaEnvios($cuenta);
+            Log::info('Cuenta de envio', $cuenta->toArray());
 
             try {
                 // Sleep random time (1 to 6 seconds)
                 sleep(rand(1, 6));
 
-                // Configure SMTP dynamically
+                /*
                 config([
-                    'mail.mailers.smtp.host' => $cuenta->smtp->host,
-                    'mail.mailers.smtp.port' => $cuenta->smtp->puerto,
+                    'mail.mailers.smtp.host' => $cuenta->SmtpConfig->host,
+                    'mail.mailers.smtp.port' => $cuenta->SmtpConfig->port,
                     'mail.mailers.smtp.username' => $cuenta->nombre,
                     'mail.mailers.smtp.password' => $cuenta->password,
-                    'mail.mailers.smtp.encryption' => $cuenta->smtp->encryption,
+                    'mail.mailers.smtp.encryption' => $cuenta->SmtpConfig->encryption,
                     'mail.from.address' => $cuenta->nombre,
                     'mail.from.name' => $cuenta->nombre,
                 ]);
 
-                dd(json_encode($cuenta));
+                config([
+                    'mail.mailers.smtp.host'       => 'smtp4dev',   // English comment: smtp4dev host
+                    'mail.mailers.smtp.port'       => 25,            // Default smtp4dev port
+                    'mail.mailers.smtp.username'   => null,
+                    'mail.mailers.smtp.password'   => null,
+                    'mail.mailers.smtp.encryption' => null,
+                    'mail.from.address'            => 'test@example.com',
+                    'mail.from.name'               => 'Testing',
+                ]);*/
 
-                // Send email
-                Mail::raw($mensaje->cuerpo, function ($m) use ($email, $mensaje) {
-                    $m->to($email->email)->subject($mensaje->subject);
-                });
+                $info = [
+                            'email' => $email->email,
+                            'from' => $cuenta->nombre
+                        ];
+                Log::info('Enviando mensaje a :', $info);
+
+
+                try {
+                    Mail::to($email->email)->send(new Notificacion($mensaje->body, $mensaje->subject));
+                    Log::info('Enviado:', ['resultado' => 'ok']);
+                } catch (\Exception $e) {
+                    Log::error('Enviado:', ['resultado' => $e->getMessage()]);
+                }
+
 
                 // Mark email as sent
                 $email->update(['enviado' => true]);
+                $email->save();
 
                 // Log result
                 EnvioResultado::create([
@@ -128,4 +195,5 @@ class EnviarEmailsJob implements ShouldQueue
             }
         }
     }
+
 }
