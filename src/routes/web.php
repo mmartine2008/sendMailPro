@@ -53,7 +53,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/cuentas', [CuentaController::class, 'index'])->name('cuentas.index');
     Route::get('/cuentas/create', [CuentaController::class, 'create'])->name('cuentas.create');
-    Route::post('/cuentas', [CuentaController::class, 'store'])->name('cuentas.store');
+//    Route::post('/cuentas', [CuentaController::class, 'store'])->name('cuentas.store');
     Route::get('/cuentas/{cuenta}/edit', [CuentaController::class, 'edit'])->name('cuentas.edit');
     Route::put('/cuentas/{cuenta}', [CuentaController::class, 'update'])->name('cuentas.update');
     Route::delete('/cuentas/{cuenta}', [CuentaController::class, 'destroy'])->name('cuentas.destroy');

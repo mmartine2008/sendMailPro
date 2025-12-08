@@ -55,6 +55,8 @@ class EnviarEmailsJob implements ShouldQueue
             foreach($mensajes as $mensaje) {
                 $this->enviarMensajeProgramado($mensaje);
             }
+            $mensaje->estado = 1;
+            $mensaje->save();
         }
     }
 
@@ -127,8 +129,6 @@ class EnviarEmailsJob implements ShouldQueue
             'subject' => $mensaje->subject
         ];
         Log::info('Enviando Mensaje Programado:', $info);
-
-
 
         // Get pending emails
         $emails = Email::where('enviado', false)->get();

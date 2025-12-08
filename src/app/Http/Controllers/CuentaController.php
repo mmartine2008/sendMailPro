@@ -24,13 +24,12 @@ class CuentaController extends Controller
 
     public function store(Request $request)
     {
-        print_r($request->all());
-
         $validator = Validator::make($request->all(), [
             'nombre'   => 'required',
             'password' => 'required',
             'smtp_id'  => 'required|exists:smtp_table,id'
         ]);
+
 
         if ($validator->fails()) {
             return back()
@@ -56,14 +55,19 @@ class CuentaController extends Controller
 
     public function update(Request $request, Cuenta $cuenta)
     {
+/*
         $request->validate([
             'nombre'   => 'required',
             'password' => 'required',
-            'smtp_id'  => 'required|exists:smtp_table,id',
             'activa' => 'nullable|boolean',
         ]);
 
-        $cuenta->update($request->all());
+        print_r($request->all()); die;
+*/
+        $datos = $request->all();
+        $datos['activa'] = $request->boolean('activa');
+
+        $cuenta->update($datos);
 
         return redirect()->route('cuentas.index');
     }
