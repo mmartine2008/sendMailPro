@@ -47,6 +47,7 @@ class EnviarEmailsJob implements ShouldQueue
 
     public function handle()
     {
+        Email::query()->update(['enviado' => 0]);
         // Get scheduled messages valid for today
         $mensajes = $this->mensajesProgramadosHoy();
 
@@ -160,18 +161,15 @@ class EnviarEmailsJob implements ShouldQueue
                         ];
                 Log::info('Enviando mensaje a :', $info);
 
-
                 try {
                     Mail::to($email->email)->send(new Notificacion($mensaje->body, $mensaje->subject));
-                    Log::info('Enviado:', ['resultado' => 'ok']);
+                    $email = Email::find($email->id);
+                    $email->enviado = 1;
+                    $email->save();
+                    Log::info('Enviado:', ['resultado' => 'ok', 'email' => $email]);
                 } catch (\Exception $e) {
                     Log::error('Enviado:', ['resultado' => $e->getMessage()]);
                 }
-
-
-                // Mark email as sent
-                $email->update(['enviado' => true]);
-                $email->save();
 
                 // Log result
                 EnvioResultado::create([
