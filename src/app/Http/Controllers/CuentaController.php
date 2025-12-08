@@ -11,7 +11,8 @@ class CuentaController extends Controller
 {
     public function index()
     {
-        $cuentas = Cuenta::with('smtp')->get();
+        $cuentas = Cuenta::with('SmtpConfig')->get();
+
         return view('cuentas.index', compact('cuentas'));
     }
 

@@ -10,6 +10,8 @@ class Cuenta extends Model
 {
     use HasFactory;
 
+    protected $table = 'cuentas';
+
     protected $fillable = [
         'nombre',
         'password',
@@ -17,8 +19,7 @@ class Cuenta extends Model
         'activa'
     ];
 
-    // Relationship: each account belongs to one smtp
-    public function smtp()
+    public function smtpConfig()
     {
         return $this->belongsTo(SmtpConfig::class, 'smtp_id');
     }

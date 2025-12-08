@@ -17,4 +17,9 @@ class SmtpConfig extends Model
         'port',
         'is_html',
     ];
+
+    public function cuentas()
+    {
+        return $this->hasMany(Cuenta::class, 'smtp_id');
+    }
 }

@@ -30,4 +30,7 @@ RUN apt install git -y
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs
 
+RUN apt install cron -y
+RUN service cron start
+
 WORKDIR /var/www/html

@@ -15,7 +15,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        //$schedule->job(new \App\Jobs\MonitorSystemJob)->everyMinute();
+        $schedule->job(new \App\Jobs\EnviarEmailsJob)->everyMinute();
     }
 
     /**

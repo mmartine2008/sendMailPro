@@ -27,8 +27,8 @@
                             <td class="py-2">{{ $cuenta->id }}</td>
                             <td class="py-2">{{ $cuenta->nombre }}</td>
                             <td class="py-2">
-                            @if ($cuenta->smtp->host)
-                                {{ $cuenta->smtp->host }}
+                            @if ($cuenta->SmtpConfig->host)
+                                {{ $cuenta->SmtpConfig->host }}
                             @else
                                 <span class="text-gray-500">Sin asignar</span>
                             @endif
